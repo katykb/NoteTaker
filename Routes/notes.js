@@ -1,10 +1,7 @@
 const app = require("express").Router();
 let db = require("../db/db.json");
 const fs = require("fs");
-const { 
-    v1: uuidv1,
-    v4: uuidv4,
-  } = require('uuid');
+const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 
 // const req = require('express/lib/request');
 // const { readFromFile, readAndAppend } = require('../helpers/fsUtils')
@@ -28,6 +25,23 @@ app.post("/", (req, res) => {
 
   console.log(newText);
   db.push(newText);
+  fs.writeFileSync("./db/db.json", JSON.stringify(db), (error) => {
+    {
+      if (error) throw error;
+    }
+  });
+  res.json(db);
+});
+
+app.delete("/:id", (req, res) => {
+  let temp = [];
+  for (let i = 0; i < db.length; i++) {
+    if (db[i].id != req.params.id) {
+      temp.push(db[i]);
+    }
+  }
+  db = temp;
+
   fs.writeFileSync("./db/db.json", JSON.stringify(db), (error) => {
     {
       if (error) throw error;

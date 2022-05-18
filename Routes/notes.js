@@ -1,28 +1,37 @@
-const texts = require('express').Router();
-const { readFromFile, readAndAppend } = require('../helpers/fsUtils')
+const app = require("express").Router();
+let db = require("../db/db.json");
+const fs = require("fs");
+const { uuid } = require("uuidv4");
 
-texts.get('/', (req, res) => {
-    readFromFile('./db/notes.json').then((data) => res.json(JSON.parese(data)));
+// const req = require('express/lib/request');
+// const { readFromFile, readAndAppend } = require('../helpers/fsUtils')
+
+app.get("/", (req, res) => {
+  db = JSON.parse(fs.readFileSync("/db/db.json"));
+  res.json(db);
 });
 
 //POST route for a new note
-texts.post('/', (req, res) => {
-    console.log(req.body);
+app.post("/", (req, res) => {
+  console.log(req.body);
 
-    const {id, text} = req.body;
+  const { text, title } = req.body;
 
-    if (req.body){
-        const newText = {
-            id,
-            text,
-            //???????????
-            note_id: 
-
-        }
-
-        readAndAppend(newNote, './db/notes.json');
-        res.json(`Text added successfully`)
-    }else {
-        res.error('Error in adding text');
+  if (req.body) {
+    const newText = {
+      title,
+      text,
+      id: uuid(),
+    };
+  }
+  console.log(newText);
+  db.push(newText);
+  fs.writeFileSync("/db/db.json", JSON.stringify(db), (error) => {
+    {
+      if (error) throw error;
     }
-})
+  });
+  res.json(db);
+});
+
+module.exports = app;
